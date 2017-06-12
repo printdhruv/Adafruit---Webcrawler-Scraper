@@ -8,9 +8,8 @@ tech stack you want to make it happen.
     Definitions:-
                 * Programmer : Dhruv Patel
                 * Email      : 669.294.6970
-                * This program serves as the attempt to solve the coding task given by the rokid.ai
-                  as an ability test to calibrate skill-set towards whosoever technology stack.I am a programmer of
-                  this code it can be used/evaluated in full or partial without my notice of concern.
+                * This program serves as the attempt to solve the coding task to scrap and crawl adafruit.com/categories
+                  I am a programmer of this code it can be used/evaluated in full or partial without my notice of concern.
     
     Logic Flow:-  
                 * The crawler fetches the master url "https://www.adafruit.com/categories" and get 35 links of various
