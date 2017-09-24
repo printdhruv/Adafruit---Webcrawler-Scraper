@@ -78,7 +78,7 @@ def fetch_data():
 
     # master_url = str(flask_request.values.get('master_url_to_fetch'))
     start = time.time()
-    connection = sqlite3.connect('C:\\Users\\print\\PycharmProjects\\Dhruv_web_crawler\\product_data.db')
+    connection = sqlite3.connect('product_data.db')
     """
         This API opens a connection to the SQLite database file database. You can use ":memory:" to open a database 
         connection to a database that resides in RAM instead of on disk. If database is opened successfully, it returns 
@@ -312,7 +312,7 @@ def fetch_data():
 def query():
     query_request = flask_request.values.get('query_to_fetch')  # Fetching the query request
     print(query_request)
-    connection = sqlite3.connect('C:\\Users\\print\\PycharmProjects\\Dhruv_web_crawler\\product_data.db')
+    connection = sqlite3.connect('product_data.db')
     cursor_reference = connection.cursor()
     cursor_reference.execute(query_request)
     query_result = cursor_reference.fetchall()
@@ -324,7 +324,7 @@ def query():
 
 @app.route('/best_seller', methods=['POST', 'GET'])
 def best_seller():
-    connection = sqlite3.connect('C:\\Users\\print\\PycharmProjects\\Dhruv_web_crawler\\product_data.db')
+    connection = sqlite3.connect('product_data.db')
     cursor_reference = connection.cursor()
     cursor_reference.execute(
         '''SELECT * FROM ADAFRUIT WHERE product_qty <=70 AND product_stock="IN STOCK" ORDER BY product_qty DESC''')
@@ -337,7 +337,7 @@ def best_seller():
 
 @app.route('/common_items', methods=['POST', 'GET'])
 def common():
-    connection = sqlite3.connect('C:\\Users\\print\\PycharmProjects\\Dhruv_web_crawler\\product_data.db')
+    connection = sqlite3.connect('product_data.db')
     cursor_reference = connection.cursor()
     cursor_reference.execute(
         '''SELECT * FROM ADAFRUIT WHERE product_qty>=100 AND product_stock="IN STOCK" ORDER BY product_qty DESC''')
@@ -350,7 +350,7 @@ def common():
 
 @app.route('/out_of_stock', methods=['POST', 'GET'])
 def out_of_stock():
-    connection = sqlite3.connect('C:\\Users\\print\\PycharmProjects\\Dhruv_web_crawler\\product_data.db')
+    connection = sqlite3.connect('product_data.db')
     cursor_reference = connection.cursor()
     cursor_reference.execute('''SELECT * FROM ADAFRUIT  WHERE product_stock="OUT OF STOCK" ORDER BY product_name ASC''')
     query_result = cursor_reference.fetchall()
@@ -362,7 +362,7 @@ def out_of_stock():
 
 @app.route('/coming_soon', methods=['POST', 'GET'])
 def coming_soon():
-    connection = sqlite3.connect('C:\\Users\\print\\PycharmProjects\\Dhruv_web_crawler\\product_data.db')
+    connection = sqlite3.connect('product_data.db')
     cursor_reference = connection.cursor()
     cursor_reference.execute('''SELECT * FROM ADAFRUIT  WHERE product_stock="COMING SOON" ORDER BY product_name ASC''')
     query_result = cursor_reference.fetchall()
@@ -374,7 +374,7 @@ def coming_soon():
 
 @app.route('/discontinued', methods=['POST', 'GET'])
 def discontinued():
-    connection = sqlite3.connect('C:\\Users\\print\\PycharmProjects\\Dhruv_web_crawler\\product_data.db')
+    connection = sqlite3.connect('product_data.db')
     cursor_reference = connection.cursor()
     cursor_reference.execute('''SELECT * FROM ADAFRUIT  WHERE product_stock="DISCONTINUED" ORDER BY product_name ASC''')
     query_result = cursor_reference.fetchall()
@@ -386,7 +386,7 @@ def discontinued():
 
 @app.route('/categories', methods=['POST', 'GET'])
 def categories():
-    connection = sqlite3.connect('C:\\Users\\print\\PycharmProjects\\Dhruv_web_crawler\\product_data.db')
+    connection = sqlite3.connect('product_data.db')
     cursor_reference = connection.cursor()
     cursor_reference.execute('''SELECT DISTINCT (product_category) FROM ADAFRUIT''')
     query_result = cursor_reference.fetchall()
@@ -401,5 +401,5 @@ if __name__ == '__main__':
     app.run()  # Run the flask app
     """
         I assume the default port=5000 for a flaks will be same on your machine
-        My all routes are mapped in index.html with url : "http://127.0.0.1:5000/" 
+        My all routes are mapped in index.html with url : "http://127.0.0.1:5000/ OR default" 
     """
