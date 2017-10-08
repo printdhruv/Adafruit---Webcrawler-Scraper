@@ -1,4 +1,4 @@
-# Adafruit.com-categories_Crawler_Scraper
+# Crawler & Scraper
 Adafruit.com web_crawling and scraping
 ## Working application to crawl and scrap a website http://www.adafruit.com/categories written in the flask framework with sqlite3 as a database.
 ## Front-end has been enhanced with materialize CSS and js library with a few other routes of Top Seller, Out Of Stock, Common items
