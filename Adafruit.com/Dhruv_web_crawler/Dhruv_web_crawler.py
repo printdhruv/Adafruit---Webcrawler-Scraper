@@ -75,8 +75,6 @@ def fetch_data():
         :return: 
             render_template function with the index.html argument  
     """
-
-    # master_url = str(flask_request.values.get('master_url_to_fetch'))
     start = time.time()
     connection = sqlite3.connect('product_data.db')
     """
@@ -142,6 +140,7 @@ def fetch_data():
     """
 
     page_soup = soup(response.content, "html.parser")
+    prefix = "https://www.adafruit.com"
 
     """
         Beautiful Soup is a Python library for pulling data out of HTML and XML files. It works with your favorite 
@@ -154,9 +153,12 @@ def fetch_data():
         :return
             BeautifulSoup object named page_soup, which represents the document as a nested data structure:  
     """
-    for link in page_soup.findAll('a', attrs={'href': re.compile("^https://www.adafruit.com/")}):
-        list_of_urls.append(link.get('href'))
-        map_of_category_names[link.get('href')] = link.get_text()
+
+    for link in page_soup.findAll('a', attrs={'href': re.compile("/category")}):
+        category = link.text
+        list_of_urls.append(prefix + link.get('href'))
+        if category.lower() != "more":
+            map_of_category_names[prefix + link.get('href')] = link.text
 
     """
         :argument
@@ -198,8 +200,8 @@ def fetch_data():
             time and will parse it's bs4 object in the following loop.
         """
 
-        for each in page_soup.findAll("div", {"class": "product-listing-right"}):
-            product = each.find("a", {"class": "ec_click_product"})
+        for each_entry in page_soup.findAll("div", {"class": "product-listing-right"}):
+            product = each_entry.find("a", {"class": "ec_click_product"})
 
             """
                 :argument .findAll()
@@ -238,22 +240,23 @@ def fetch_data():
                         them we have used this utility.
                 """
 
-            price = each.find("span", {"class": ["normal-price"]})
+            price = each_entry.find("span", {"class": ["normal-price"]})
 
             # It will fetch span with a class of normal-price and store into price variable.
-
 
             if price is not None:
                 price_string = price.getText()  # Will fetch price text
                 if "," not in price_string:
-                    product_price = float(price_string[1:]);  # Will fetch the simple format prices removing '$'
+                    try:
+                        product_price = float(price_string[1:])  # Will fetch the simple format prices removing '$'
+                    except Exception:
+                        product_price = float(re.findall(r'[-+]?\d*\.\d+|\d+', price_string)[0])
                 else:
                     r = re.findall('\d', price_string)  # to handle case as i.e 2,499
-                    product_price = float(''.join(r));
-
+                    product_price = float(''.join(r))
             else:
                 product_price = 0.00  # If product has no price listed.
-            red_price = each.find("span", {"class": ["red-sale-price"]})
+            red_price = each_entry.find("span", {"class": ["red-sale-price"]})
             """
                         The red price class is to used to list SALE price and strikethrough the normal price.
                         If such product has sale price than red_price block will be executed.
@@ -263,31 +266,32 @@ def fetch_data():
             if red_price is not None:
                 price_string = red_price.getText()
                 if "," not in price_string:
-                    product_price = float(price_string[1:]);
+                    product_price = float(price_string[1:])
                 else:
                     r = re.findall('\d', price_string)
-                    product_price = float(''.join(r));
+                    product_price = float(''.join(r))
 
-            stock = each.find("div", {"class": "stock"})
-            line = stock.getText()
-            r = re.findall('\d+', line)
-            if r:
-                product_qty = r[0]  # Will fetch the product_qty with regular expression
-            else:
-                product_qty = 0
+            stock = each_entry.find("div", {"class": "stock"})
+            if stock:
+                line = stock.getText()
+                r = re.findall('\d+', line)
+                if r:
+                    product_qty = r[0]  # Will fetch the product_qty with regular expression
+                else:
+                    product_qty = 0
 
-            if "IN STOCK" in line:
-                product_stock = "IN STOCK"
-            if "OUT OF STOCK" in line:
-                product_stock = "OUT OF STOCK"
-            if "DISCONTINUED" in line:
-                product_stock = "DISCONTINUED"
-            if "COMING SOON" in line:
-                product_stock = "COMING SOON"
+                if "IN STOCK" in line:
+                    product_stock = "IN STOCK"
+                if "OUT OF STOCK" in line:
+                    product_stock = "OUT OF STOCK"
+                if "DISCONTINUED" in line:
+                    product_stock = "DISCONTINUED"
+                if "COMING SOON" in line:
+                    product_stock = "COMING SOON"
 
-            """
-                        The simple if block to fetch the stock with utility if "string" in line with the various options 
-            """
+                """
+                            The simple if block to fetch the stock with utility if "string" in line with the various options 
+                """
             print(product_category, product_id, product_name, product_price, product_stock, product_qty)
             cursor_reference.execute(
                 '''INSERT INTO ADAFRUIT(product_category, product_id, product_name, product_price, product_qty, product_stock)VALUES (?,?,?,?,?,?)''',
@@ -296,12 +300,12 @@ def fetch_data():
                         We are inserting the data into the table ADAFRUIT. Initiazlizing the variables to their default 
                         values before going to the next loop iteration.
             """
-            product_id = 0;
-            product_name = "";
-            product_price = 0.00;
-            product_qty = 0;
+            product_id = 0
+            product_name = ""
+            product_price = 0.00
+            product_qty = 0
             product_stock = ""
-    end = time.time()
+    end = time.time() - start
     print(int(end % 60))  # Total time to crawl and scrap
     connection.commit()  # Committing the changes
     connection.close()  # Closing the database connection
